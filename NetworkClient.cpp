@@ -3,26 +3,48 @@
 #include "Firebase_Arduino_WiFiNINA.h"
 #include <Arduino.h>
 
-void scanNetworks(int status, char ssid[], char pass[]) {
+extern char ssid[];
+extern char pass[];
+extern int status;
+
+
+void connectToWifi(char ssid[]){
+  Serial.print("Connecting to network");
+  Serial.println(ssid);
+  WiFi.begin(ssid);
+}
+
+void connectToWifi(char ssid[], char pass[]){
+    Serial.print("Connecting to network");
+    Serial.println(ssid);
+    WiFi.begin(ssid, pass);
+}
+
+void scanNetworks() {
   // scan for nearby networks:
   Serial.println("** Scanning Networks **");
   int numSsid = WiFi.scanNetworks();
   if (numSsid == -1) {
     Serial.println("Couldn't get a WiFi connection");
-    while (1);
+    scanNetworks();
   }
 
   // print the list of networks seen:
   Serial.print("number of available networks:");
   Serial.println(numSsid);
-
   // print the network number and name for each network found:
   for (int thisNet = 0; thisNet < numSsid; thisNet++) {
-    if(WiFi.SSID(thisNet) ==  ssid) {
       Serial.print("Found Network: ");
       Serial.println(WiFi.SSID(thisNet));
-      Serial.print("Connecting ");
-      status = WiFi.begin(ssid, pass);
+      if(strcmp(WiFi.SSID(thisNet),ssid)) {
+        if(pass == NULL){
+          connectToWifi(ssid);
+        }
+        else {
+          connectToWifi(ssid,pass);
+        }
+        status = WL_CONNECTED;
+        break;
     }
   }
 }

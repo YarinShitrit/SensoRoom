@@ -7,7 +7,6 @@
 char ssid[] = "HOTBOX 4-5B08";
 char pass[] = "0544227393";
 int status = -1;
-
 FirebaseData data; 
 void setup() {
   //Initialize serial and wait for port to open:
@@ -27,17 +26,11 @@ void setup() {
   if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
     Serial.println("Please upgrade the firmware");
   }
-
-  scanNetworks(status, ssid, pass);
-
+  
   // attempt to connect to WiFi network:
   while (status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to WPA SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network:
-    status = WiFi.begin(ssid, pass);
-
-    // wait 10 seconds for connection:
+    Serial.println("Setup connect");
+    scanNetworks();
     delay(10000);
   }
   Firebase.begin(DATABASE_URL, DATABASE_SECRET, ssid, pass);
@@ -46,10 +39,9 @@ void setup() {
 
 void loop() {
   // scan for existing networks:
-  if(WiFi.status() != WL_CONNECTED) {
+  if(status != WL_CONNECTED) {
   Serial.println("Not Connected");
-  Serial.println("Scanning available networks...");
-  scanNetworks(status, ssid, pass);
+  scanNetworks();
   }
   else{
     Serial.println("Connected!");
@@ -58,5 +50,5 @@ void loop() {
     Serial.println("Updating Database...");
     updateDatabase(data);
   }
-  delay(60000);
+  delay(6000);
 }
